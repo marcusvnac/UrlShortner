@@ -20,7 +20,7 @@ namespace ShortherUrlCore.Storage.AzureTableStorage
             this.logger = logger;
         }
 
-        public async Task Upsert(ShortUrl shortUrl)
+        public async Task Insert(ShortUrl shortUrl)
         {
             var tableRef = await CreateTableAsync();
 

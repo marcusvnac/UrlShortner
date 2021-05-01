@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ShortherUrlCore.Business;
 using ShortherUrlCore.Storage;
-using ShortherUrlCore.Storage.AzureTableStorage;
+using ShortherUrlCore.Storage.SqlServer;
 
 namespace ShortnerUrl
 {
@@ -22,7 +22,9 @@ namespace ShortnerUrl
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddSingleton<IStorageManager, AzureTableStorageManager>();
+            // Choose which Data Provider to use
+            //services.AddSingleton<IStorageManager, AzureTableStorageManager>();
+            services.AddSingleton<IStorageManager, SqlServerStorageManager>();
             services.AddScoped<IShortnerUrlBS, ShortnerUrlBS>();
         }
 

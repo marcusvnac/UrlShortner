@@ -52,7 +52,7 @@ namespace ShortherUrlCore.Business
 
             } while (storedShortUrl != null);
 
-            await storageManager.Upsert(new ShortUrl { OriginalUrl = originalUrl, ShortnedUrl = hashUrl });
+            await storageManager.Insert(new ShortUrl { OriginalUrl = originalUrl, ShortnedUrl = hashUrl });
 
             return hashUrl;
         }

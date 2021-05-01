@@ -7,6 +7,6 @@ namespace ShortherUrlCore.Storage
     {
         Task<ShortUrl> Get(string hashUrl);
 
-        Task Upsert(ShortUrl shortUrl);
+        Task Insert(ShortUrl shortUrl);
     }
 }
