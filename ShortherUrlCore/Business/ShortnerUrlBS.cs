@@ -1,6 +1,8 @@
-﻿using ShortherUrlCore.Storage;
-using ShortherUrlCore.Storage.Models;
+﻿using ShortherUrlCore.Models;
+using ShortherUrlCore.Storage;
 using System;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace ShortherUrlCore.Business
@@ -13,7 +15,7 @@ namespace ShortherUrlCore.Business
         {
             this.storageManager = storageManager;
         }
-        
+
         public async Task<string> Process(string originalUrl)
         {
             if (string.IsNullOrWhiteSpace(originalUrl))
@@ -26,11 +28,9 @@ namespace ShortherUrlCore.Business
 
         private async Task<string> Shortner(string originalUrl)
         {
-            var hashCode =  originalUrl.GetHashCode(StringComparison.InvariantCultureIgnoreCase);
+            var hashCode = CalculateHash(originalUrl);
 
-            var hashUrl = hashCode.ToString("X8");
-
-            return await GetHashUrl(hashUrl, originalUrl);
+            return await GetHashUrl(hashCode, originalUrl);
         }
 
         // Checks if the new Hash has collision. Change it in case and returns a valid unique value
@@ -52,9 +52,21 @@ namespace ShortherUrlCore.Business
 
             } while (storedShortUrl != null);
 
-            await storageManager.Upsert(new ShortUrl (hashUrl, originalUrl));
+            await storageManager.Upsert(new ShortUrl { OriginalUrl = originalUrl, ShortnedUrl = hashUrl });
 
             return hashUrl;
+        }
+
+        /// <summary>
+        /// Knuth hash
+        /// </summary>
+        private string CalculateHash(string text)
+        {
+            using (var md5Hasher = MD5.Create())
+            {
+                var data = md5Hasher.ComputeHash(Encoding.Default.GetBytes(text));
+                return BitConverter.ToString(data).Replace("-", "").Substring(0, 10);
+            }
         }
     }
 }

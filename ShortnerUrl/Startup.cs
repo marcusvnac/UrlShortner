@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ShortherUrlCore.Business;
 using ShortherUrlCore.Storage;
+using ShortherUrlCore.Storage.AzureTableStorage;
 
 namespace ShortnerUrl
 {

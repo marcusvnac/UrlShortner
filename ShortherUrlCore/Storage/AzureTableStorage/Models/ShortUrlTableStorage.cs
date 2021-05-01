@@ -1,15 +1,15 @@
 ﻿using Microsoft.Azure.Cosmos.Table;
 
-namespace ShortherUrlCore.Storage.Models
+namespace ShortherUrlCore.Storage.Models.AzureTableStorage
 {
-    public class ShortUrl : TableEntity
+    public class ShortUrlTableStorage : TableEntity
     {
-        public ShortUrl()
+        public ShortUrlTableStorage()
         {
 
         }
 
-        public ShortUrl(string hashUrl, string originalUrl)
+        public ShortUrlTableStorage(string hashUrl, string originalUrl)
         {
             PartitionKey = hashUrl;
             RowKey = hashUrl;

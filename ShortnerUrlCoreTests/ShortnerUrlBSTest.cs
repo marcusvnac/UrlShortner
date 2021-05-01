@@ -1,8 +1,8 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using ShortherUrlCore.Business;
+using ShortherUrlCore.Models;
 using ShortherUrlCore.Storage;
-using ShortherUrlCore.Storage.Models;
 using System;
 using System.Threading.Tasks;
 
@@ -12,15 +12,12 @@ namespace ShortnerUrlCoreTests
     public class ShortnerUrlBSTest
     {
         private IShortnerUrlBS shortnerUrlBS;
+        private Mock<IStorageManager> mockStorageManager;
 
         [TestInitialize]
         public void TestInitialize()
         {
-            var mockStorageManager = new Mock<IStorageManager>();
-            mockStorageManager.Setup(
-                x => x.Get(It.IsAny<string>()))
-                .ReturnsAsync((string origUrl) => new ShortUrl(origUrl.GetHashCode().ToString("X8"), origUrl));
-
+            mockStorageManager = new Mock<IStorageManager>();
             shortnerUrlBS = new ShortnerUrlBS(mockStorageManager.Object);
         }
 
@@ -28,16 +25,22 @@ namespace ShortnerUrlCoreTests
         public async Task ShortnerGoldPath()
         {
             var originalUrl = "http://www.shopify.com/testyourstuffhere";
+            var expectedShortUrl = "5B452990C0";
+            mockStorageManager.Reset();
+            mockStorageManager.Setup(
+               x => x.Get(It.IsAny<string>()))
+               .ReturnsAsync((string origUrl) => new ShortUrl { ShortnedUrl = expectedShortUrl, OriginalUrl = originalUrl });
 
             var shortUrl = await shortnerUrlBS.Process(originalUrl);
 
             Assert.IsTrue(shortUrl.Length <= originalUrl.Length);
+            Assert.AreEqual(expectedShortUrl, shortUrl);
         }
 
         [TestMethod]
         public void ShortnerEmptyCurrentUrl()
         {
-            Assert.ThrowsException<ArgumentException>(() => shortnerUrlBS.Process(""));
+            Assert.ThrowsExceptionAsync<ArgumentException>(() => shortnerUrlBS.Process(""));
         }
     }
 }

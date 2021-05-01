@@ -1,4 +1,4 @@
-﻿using ShortherUrlCore.Storage.Models;
+﻿using ShortherUrlCore.Models;
 using System.Threading.Tasks;
 
 namespace ShortherUrlCore.Storage

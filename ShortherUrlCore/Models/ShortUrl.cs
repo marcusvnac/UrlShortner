@@ -1,6 +1,6 @@
 ﻿namespace ShortherUrlCore.Models
 {
-    public class ShortnerUrlModel
+    public class ShortUrl
     {
         public string OriginalUrl { get; set; }
         public string ShortnedUrl { get; set; }

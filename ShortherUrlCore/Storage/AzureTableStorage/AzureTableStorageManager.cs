@@ -1,11 +1,12 @@
 ﻿using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using ShortherUrlCore.Storage.Models;
+using ShortherUrlCore.Models;
+using ShortherUrlCore.Storage.Models.AzureTableStorage;
 using System;
 using System.Threading.Tasks;
 
-namespace ShortherUrlCore.Storage
+namespace ShortherUrlCore.Storage.AzureTableStorage
 {
     public class AzureTableStorageManager : IStorageManager
     {
@@ -23,18 +24,17 @@ namespace ShortherUrlCore.Storage
         {
             var tableRef = await CreateTableAsync();
 
-            await InsertOrMergeEntityAsync(tableRef, shortUrl);
+            await InsertOrMergeEntityAsync(tableRef, new ShortUrlTableStorage(shortUrl.ShortnedUrl, shortUrl.OriginalUrl));
         }
 
         public async Task<ShortUrl> Get(string hashUrl)
         {
             var tableRef = await CreateTableAsync();
 
-            var res = await RetrieveEntityUsingPointQueryAsync(tableRef, hashUrl, hashUrl);
+            var data = await RetrieveEntityUsingPointQueryAsync(tableRef, hashUrl, hashUrl);
 
-            return res;
+            return (data != null) ? new ShortUrl { ShortnedUrl = data.HashUrl, OriginalUrl = data.OriginalUrl } : null;
         }
-
 
         private CloudStorageAccount CreateStorageAccountFromConnectionString()
         {
@@ -82,7 +82,7 @@ namespace ShortherUrlCore.Storage
             return table;
         }
 
-        private async Task<ShortUrl> InsertOrMergeEntityAsync(CloudTable table, ShortUrl entity)
+        private async Task<ShortUrlTableStorage> InsertOrMergeEntityAsync(CloudTable table, ShortUrlTableStorage entity)
         {
             if (entity == null)
             {
@@ -96,7 +96,7 @@ namespace ShortherUrlCore.Storage
 
                 // Execute the operation.
                 TableResult result = await table.ExecuteAsync(insertOrMergeOperation);
-                ShortUrl insertedCustomer = result.Result as ShortUrl;
+                ShortUrlTableStorage insertedCustomer = result.Result as ShortUrlTableStorage;
 
                 if (result.RequestCharge.HasValue)
                 {
@@ -113,13 +113,13 @@ namespace ShortherUrlCore.Storage
             }
         }
 
-        private async Task<ShortUrl> RetrieveEntityUsingPointQueryAsync(CloudTable table, string partitionKey, string rowKey)
+        private async Task<ShortUrlTableStorage> RetrieveEntityUsingPointQueryAsync(CloudTable table, string partitionKey, string rowKey)
         {
             try
             {
-                TableOperation retrieveOperation = TableOperation.Retrieve<ShortUrl>(partitionKey, rowKey);
+                TableOperation retrieveOperation = TableOperation.Retrieve<ShortUrlTableStorage>(partitionKey, rowKey);
                 TableResult result = await table.ExecuteAsync(retrieveOperation);
-                ShortUrl shortUrl = result.Result as ShortUrl;
+                ShortUrlTableStorage shortUrl = result.Result as ShortUrlTableStorage;
                 if (shortUrl != null)
                 {
                     logger.LogDebug("\t{0}\t{1}\t{2}\t{3}", shortUrl.PartitionKey, shortUrl.RowKey, shortUrl.HashUrl, shortUrl.OriginalUrl);
