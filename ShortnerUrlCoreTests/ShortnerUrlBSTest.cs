@@ -42,5 +42,43 @@ namespace ShortnerUrlCoreTests
         {
             Assert.ThrowsExceptionAsync<ArgumentException>(() => shortnerUrlBS.Process(""));
         }
+
+        [TestMethod]
+        public async Task ShortnerUsePreviousStoredValue()
+        {
+            var originalUrl = "http://www.shopify.com/testyourstuffhere";
+            var expectedShortUrl = "5B452990C0";
+            mockStorageManager.Reset();
+
+            ShortUrl res = null;
+            mockStorageManager.Setup(
+               x => x.Get(It.IsAny<string>()))
+               .Returns(Task.FromResult(res));
+
+            mockStorageManager.Setup(
+               x => x.Insert(It.IsAny<ShortUrl>()))
+               .Returns(Task.CompletedTask);
+
+            // call first time
+            var shortUrl = await shortnerUrlBS.Process(originalUrl);
+
+            mockStorageManager.Setup(
+               x => x.Get(It.IsAny<string>()))
+               .ReturnsAsync((string origUrl) => new ShortUrl { ShortnedUrl = expectedShortUrl, OriginalUrl = originalUrl });
+            
+            // call second time
+            shortUrl = await shortnerUrlBS.Process(originalUrl);
+
+            Assert.IsTrue(shortUrl.Length <= originalUrl.Length);
+            Assert.AreEqual(expectedShortUrl, shortUrl);
+
+            mockStorageManager.Verify(
+                x => x.Get(It.IsAny<string>()),
+                Times.Exactly(2));
+
+            mockStorageManager.Verify(
+                x => x.Insert(It.IsAny<ShortUrl>()),
+                Times.Once());
+        }
     }
 }
