@@ -128,7 +128,7 @@ namespace ShortherUrlCore.Storage.AzureTableStorage
                     logger.LogDebug("Request Charge of Retrieve Operation: " + result.RequestCharge);
                 }
 
-                return shortUrl ?? throw new InvalidOperationException("ShortUrlTableStorage entity not found.");
+                return shortUrl;
             }
             catch (StorageException e)
             {

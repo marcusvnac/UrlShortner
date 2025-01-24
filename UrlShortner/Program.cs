@@ -2,6 +2,7 @@ using ShortherUrlCore.Storage.InMemory;
 using ShortherUrlCore.Storage;
 using ShortherUrlCore.Business;
 using ShortherUrlCore.Storage.SqlServer;
+using ShortherUrlCore.Storage.AzureTableStorage;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,10 +10,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-// Choose which Data Provider to use
+// Choose which Data Provider to use. Choose 1
 //builder.Services.AddSingleton<IStorageManager, InMemoryStorageManager>();
-//builder.Services.AddSingleton<IStorageManager, AzureTableStorageManager>();
-builder.Services.AddSingleton<IStorageManager, SqlServerStorageManager>();
+builder.Services.AddSingleton<IStorageManager, AzureTableStorageManager>();
+//builder.Services.AddSingleton<IStorageManager, SqlServerStorageManager>();
 
 builder.Services.AddScoped<IShortnerUrlBS, ShortnerUrlBS>();
 
