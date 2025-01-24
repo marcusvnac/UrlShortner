@@ -1,0 +1,7 @@
+@UrlShortner_HostAddress = http://localhost:5062
+@NewUrl = www.test.com
+
+GET {{UrlShortner_HostAddress}}/api/ShortUrl/{{NewUrl}}
+Accept: application/json
+
+###

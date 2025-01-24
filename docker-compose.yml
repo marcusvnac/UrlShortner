@@ -1,0 +1,28 @@
+services:
+  # urlshortner:
+  #   image: ${DOCKER_REGISTRY-}urlshortner
+  #   build:
+  #     context: .
+  #     dockerfile: UrlShortner/Dockerfile
+  #   environment:
+  #     - ASPNETCORE_ENVIRONMENT=Development
+  #     - ASPNETCORE_HTTP_PORTS=8080
+  #   ports:
+  #     - "8080"
+   
+  sqlverver:
+    hostname: sqlserver
+    image: mcr.microsoft.com/mssql/server
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: Password123$
+    ports:
+      - "1433:1433"
+
+  azurite:
+    hostname: azurite
+    image: mcr.microsoft.com/azure-storage/azurite
+    ports:
+      - "10000:10000"
+      - "10001:10001"
+      - "10002:10002"
